@@ -2,6 +2,14 @@
 
 Vier statische, trackingfreie Widgets für Notion. Es gibt keine externen Abhängigkeiten, Konten, Cookies, API-Aufrufe oder Analysedienste.
 
+## Live
+
+Die öffentliche, von Notion einbettbare Version läuft unter:
+
+`https://mariusdiel5-art.github.io/notion-studio-widgets/`
+
+Für einzelne Widgets wird einer der unten dokumentierten Query-Parameter an diese Basis-URL angehängt.
+
 ## Lokal starten
 
 ```bash
