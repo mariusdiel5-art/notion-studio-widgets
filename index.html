@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      name="description"
+      content="Private, trackingfreie Widgets für Notion: Uhr, Pomodoro, Zeitfortschritt und Zinseszinsrechner."
+    />
+    <title>Studio Widgets</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header" id="site-header">
+      <a class="wordmark" href="./" aria-label="Studio Widgets – Startseite">
+        <span class="wordmark-mark" aria-hidden="true"></span>
+        <span>Studio Widgets</span>
+      </a>
+      <nav class="site-nav" aria-label="Widgets">
+        <a href="?widget=clock">Uhr</a>
+        <a href="?widget=pomodoro">Fokus</a>
+        <a href="?widget=progress">Fortschritt</a>
+        <a href="?widget=calculator">Zinseszins</a>
+      </nav>
+      <button class="icon-button theme-toggle" type="button" aria-label="Farbschema wechseln" title="Farbschema wechseln">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.4 15.1A8.4 8.4 0 0 1 8.9 3.6 8.5 8.5 0 1 0 20.4 15Z" />
+        </svg>
+      </button>
+    </header>
+
+    <main id="app" tabindex="-1"></main>
+
+    <footer class="site-footer" id="site-footer">
+      <span>Keine Konten. Kein Tracking. Daten bleiben auf diesem Gerät.</span>
+      <span aria-hidden="true">·</span>
+      <span>Europe/Berlin</span>
+    </footer>
+
+    <noscript>Für die interaktiven Widgets muss JavaScript aktiviert sein.</noscript>
+  </body>
+</html>
