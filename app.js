@@ -3,7 +3,8 @@
 
   const STORAGE = {
     theme: "studio-widgets:theme",
-    pomodoro: "studio-widgets:pomodoro"
+    pomodoro: "studio-widgets:pomodoro",
+    whiteboard: "studio-widgets:whiteboard"
   };
 
   const MODES = {
@@ -22,7 +23,10 @@
     progress: "progress",
     fortschritt: "progress",
     calculator: "calculator",
-    zinseszins: "calculator"
+    zinseszins: "calculator",
+    whiteboard: "whiteboard",
+    board: "whiteboard",
+    tafel: "whiteboard"
   };
 
   const pathParts = window.location.pathname.split("/").filter(Boolean);
@@ -102,13 +106,14 @@
       <section class="home-hero">
         <p class="eyebrow">Native Ergänzungen für Notion</p>
         <h1>Werkzeuge, die ruhig im Hintergrund arbeiten.</h1>
-        <p class="lede">Vier kleine, präzise Widgets für Fokus, Zeitgefühl und langfristige Planung – ohne Anmeldung, Cookies oder fremde Dienste.</p>
+        <p class="lede">Fünf kleine, präzise Widgets für Fokus, Zeitgefühl, Planung und freie Gedanken – ohne Anmeldung, Cookies oder fremde Dienste.</p>
       </section>
       <section class="widget-grid" aria-label="Verfügbare Widgets">
         ${homeCard("01", "Analoge Uhr", "Sekundengenaue Ortszeit, Datum und Zeitzone in einer reduzierten Zifferblatt-Ansicht.", "clock")}
         ${homeCard("02", "Pomodoro", "Ein belastbarer 25/5/15-Timer mit lokalem Sitzungszähler und Wiederaufnahme nach einem Reload.", "pomodoro")}
         ${homeCard("03", "Zeitfortschritt", "Tag, Woche, Monat und Jahr als live berechnete Fortschrittsringe.", "progress")}
         ${homeCard("04", "Zinseszins", "Interaktiver Sparrechner mit Einzahlung, Rendite, Laufzeit und klar ausgewiesenem Zinsertrag.", "calculator")}
+        ${homeCard("05", "Whiteboard", "Eine stiftfähige Zeichenfläche mit Undo, lokalem Autosave und PNG-Export.", "whiteboard")}
       </section>`;
   }
 
@@ -608,13 +613,446 @@
     updateCalculator();
   }
 
+  function renderWhiteboard() {
+    document.title = "Whiteboard · Studio Widgets";
+    updateActiveNavigation("whiteboard");
+    const colors = ["#222222", "#7c6046", "#b34b4b", "#3f7258", "#426c91", "#7a5d9a"];
+    app.innerHTML = widgetFrame("Whiteboard", "Ideen · Skizzen · Notizen", `
+      <div class="widget-meta whiteboard-meta">
+        <span><span class="status-dot"></span><span id="whiteboard-save-status">Lokal bereit</span></span>
+        <span>Nur in diesem Browser gespeichert</span>
+      </div>
+      <div class="whiteboard-layout">
+        <div class="whiteboard-toolbar" role="toolbar" aria-label="Zeichenwerkzeuge">
+          <div class="tool-group" aria-label="Werkzeug">
+            <button class="tool-button" id="whiteboard-pen" type="button" aria-pressed="true" title="Stift (P)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.7 5.3 4 4M4 20l4.2-1 10-10a2.8 2.8 0 0 0-4-4l-10 10L4 20Z"/><path d="m12.8 6.2 4 4"/></svg>
+              <span>Stift</span>
+            </button>
+            <button class="tool-button" id="whiteboard-eraser" type="button" aria-pressed="false" title="Radierer (E)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8.2 18.8-4-4a2 2 0 0 1 0-2.8l7.7-7.7a2 2 0 0 1 2.8 0l5 5a2 2 0 0 1 0 2.8L13 18.8H8.2Z"/><path d="m9.5 6.7 7.8 7.8M8.2 18.8H21"/></svg>
+              <span>Radierer</span>
+            </button>
+          </div>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <div class="color-tools" aria-label="Stiftfarbe">
+            ${colors.map((color, index) => `
+              <button
+                class="color-swatch"
+                type="button"
+                data-whiteboard-color="${color}"
+                style="--swatch: ${color}"
+                aria-label="Farbe ${index + 1}"
+                aria-pressed="${index === 0 ? "true" : "false"}"
+              ></button>`).join("")}
+            <label class="custom-color" title="Eigene Farbe">
+              <span class="visually-hidden">Eigene Farbe</span>
+              <input id="whiteboard-color" type="color" value="#222222" aria-label="Eigene Stiftfarbe" />
+            </label>
+          </div>
+          <span class="toolbar-divider" aria-hidden="true"></span>
+          <label class="stroke-control" for="whiteboard-width">
+            <span>Stärke</span>
+            <input id="whiteboard-width" type="range" min="1" max="24" step="1" value="4" />
+            <output id="whiteboard-width-output" for="whiteboard-width">4</output>
+          </label>
+          <div class="toolbar-spacer"></div>
+          <div class="tool-group" aria-label="Verlauf">
+            <button class="tool-button icon-only" id="whiteboard-undo" type="button" title="Rückgängig (⌘Z)" aria-label="Rückgängig" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 7-5 5 5 5"/><path d="M20 17a7 7 0 0 0-7-7H4"/></svg>
+            </button>
+            <button class="tool-button icon-only" id="whiteboard-redo" type="button" title="Wiederholen (⇧⌘Z)" aria-label="Wiederholen" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 7 5 5-5 5"/><path d="M4 17a7 7 0 0 1 7-7h9"/></svg>
+            </button>
+          </div>
+          <button class="tool-button quiet-action" id="whiteboard-clear" type="button">Leeren</button>
+          <button class="tool-button export-action" id="whiteboard-export" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+            <span>PNG</span>
+          </button>
+        </div>
+        <div class="whiteboard-canvas-wrap">
+          <canvas
+            id="whiteboard-canvas"
+            tabindex="0"
+            aria-label="Freie Zeichenfläche. Mit Maus, Touch oder Stift zeichnen."
+            data-tool="pen"
+          ></canvas>
+          <div class="whiteboard-canvas-hint" id="whiteboard-canvas-hint">
+            <span>Zeichne mit Maus, Touch oder Stift</span>
+            <span>P · Stift&nbsp;&nbsp; E · Radierer&nbsp;&nbsp; ⌘Z · Rückgängig</span>
+          </div>
+        </div>
+      </div>
+      <dialog class="confirm-dialog" id="whiteboard-clear-dialog" aria-labelledby="whiteboard-clear-title">
+        <form method="dialog">
+          <p class="eyebrow">Whiteboard leeren</p>
+          <h3 id="whiteboard-clear-title">Alles wirklich löschen?</h3>
+          <p>Die aktuelle Zeichenfläche wird geleert. Direkt danach kannst du den Schritt noch rückgängig machen.</p>
+          <div class="dialog-actions">
+            <button class="button secondary" value="cancel">Abbrechen</button>
+            <button class="button danger" id="whiteboard-confirm-clear" type="button">Whiteboard leeren</button>
+          </div>
+        </form>
+      </dialog>`);
+
+    initializeTheme();
+
+    const canvas = document.querySelector("#whiteboard-canvas");
+    const canvasWrap = document.querySelector(".whiteboard-canvas-wrap");
+    const hint = document.querySelector("#whiteboard-canvas-hint");
+    const penButton = document.querySelector("#whiteboard-pen");
+    const eraserButton = document.querySelector("#whiteboard-eraser");
+    const colorInput = document.querySelector("#whiteboard-color");
+    const widthInput = document.querySelector("#whiteboard-width");
+    const widthOutput = document.querySelector("#whiteboard-width-output");
+    const undoButton = document.querySelector("#whiteboard-undo");
+    const redoButton = document.querySelector("#whiteboard-redo");
+    const clearButton = document.querySelector("#whiteboard-clear");
+    const clearDialog = document.querySelector("#whiteboard-clear-dialog");
+    const confirmClear = document.querySelector("#whiteboard-confirm-clear");
+    const exportButton = document.querySelector("#whiteboard-export");
+    const saveStatus = document.querySelector("#whiteboard-save-status");
+
+    let context = canvas.getContext("2d", { alpha: true });
+    let logicalWidth = 1;
+    let logicalHeight = 1;
+    let pixelRatio = 1;
+    let tool = "pen";
+    let activeStrokeTool = "pen";
+    let color = colorInput.value;
+    let strokeWidth = Number(widthInput.value);
+    let drawing = false;
+    let pointerId = null;
+    let lastPoint = null;
+    let hasInk = false;
+    let initialized = false;
+    let saveTimer = null;
+    let restoreVersion = 0;
+    let history = [];
+    let historyIndex = -1;
+
+    function setTool(nextTool) {
+      tool = nextTool;
+      canvas.dataset.tool = nextTool;
+      penButton.setAttribute("aria-pressed", String(nextTool === "pen"));
+      eraserButton.setAttribute("aria-pressed", String(nextTool === "eraser"));
+    }
+
+    function setColor(nextColor, matchedSwatch = null) {
+      color = nextColor;
+      colorInput.value = nextColor;
+      document.querySelectorAll("[data-whiteboard-color]").forEach((swatch) => {
+        swatch.setAttribute("aria-pressed", String(swatch === matchedSwatch || swatch.dataset.whiteboardColor.toLowerCase() === nextColor.toLowerCase()));
+      });
+      setTool("pen");
+    }
+
+    function resizeCanvas(preserve = true) {
+      const rect = canvas.getBoundingClientRect();
+      const nextWidth = Math.max(1, Math.floor(rect.width));
+      const nextHeight = Math.max(1, Math.floor(rect.height));
+      const nextRatio = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+      const targetWidth = Math.round(nextWidth * nextRatio);
+      const targetHeight = Math.round(nextHeight * nextRatio);
+      if (canvas.width === targetWidth && canvas.height === targetHeight) return;
+
+      let previous = null;
+      if (preserve && canvas.width > 1 && canvas.height > 1) {
+        previous = document.createElement("canvas");
+        previous.width = canvas.width;
+        previous.height = canvas.height;
+        previous.getContext("2d").drawImage(canvas, 0, 0);
+      }
+
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      logicalWidth = nextWidth;
+      logicalHeight = nextHeight;
+      pixelRatio = nextRatio;
+      context = canvas.getContext("2d", { alpha: true });
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      context.lineCap = "round";
+      context.lineJoin = "round";
+
+      if (previous) {
+        context.save();
+        context.setTransform(1, 0, 0, 1, 0, 0);
+        context.drawImage(previous, 0, 0, previous.width, previous.height, 0, 0, targetWidth, targetHeight);
+        context.restore();
+      }
+    }
+
+    function pointerPoint(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: Math.min(logicalWidth, Math.max(0, event.clientX - rect.left)),
+        y: Math.min(logicalHeight, Math.max(0, event.clientY - rect.top)),
+        pressure: event.pointerType === "pen" && event.pressure > 0 ? event.pressure : 0.5
+      };
+    }
+
+    function lineSize(point) {
+      const pressureFactor = point.pressure === 0.5 ? 1 : 0.55 + point.pressure * 0.9;
+      return strokeWidth * pressureFactor * (activeStrokeTool === "eraser" ? 3 : 1);
+    }
+
+    function prepareStroke(point) {
+      context.globalCompositeOperation = activeStrokeTool === "eraser" ? "destination-out" : "source-over";
+      context.strokeStyle = color;
+      context.fillStyle = color;
+      context.lineWidth = lineSize(point);
+      context.lineCap = "round";
+      context.lineJoin = "round";
+    }
+
+    function drawDot(point) {
+      context.save();
+      prepareStroke(point);
+      context.beginPath();
+      context.arc(point.x, point.y, Math.max(0.5, lineSize(point) / 2), 0, Math.PI * 2);
+      context.fill();
+      context.restore();
+    }
+
+    function drawSegment(from, to) {
+      context.save();
+      prepareStroke(to);
+      context.beginPath();
+      context.moveTo(from.x, from.y);
+      context.lineTo(to.x, to.y);
+      context.stroke();
+      context.restore();
+    }
+
+    function beginStroke(event) {
+      if (!initialized || (event.pointerType === "mouse" && event.button !== 0)) return;
+      event.preventDefault();
+      drawing = true;
+      pointerId = event.pointerId;
+      activeStrokeTool = event.pointerType === "pen" && event.button === 5 ? "eraser" : tool;
+      lastPoint = pointerPoint(event);
+      canvas.setPointerCapture(event.pointerId);
+      drawDot(lastPoint);
+      hasInk = true;
+      hint.hidden = true;
+    }
+
+    function continueStroke(event) {
+      if (!drawing || event.pointerId !== pointerId) return;
+      event.preventDefault();
+      const samples = typeof event.getCoalescedEvents === "function" ? event.getCoalescedEvents() : [event];
+      samples.forEach((sample) => {
+        const nextPoint = pointerPoint(sample);
+        drawSegment(lastPoint, nextPoint);
+        lastPoint = nextPoint;
+      });
+    }
+
+    function endStroke(event) {
+      if (!drawing || event.pointerId !== pointerId) return;
+      event.preventDefault();
+      drawing = false;
+      if (canvas.hasPointerCapture(pointerId)) canvas.releasePointerCapture(pointerId);
+      pointerId = null;
+      lastPoint = null;
+      pushHistory();
+      queueAutosave();
+    }
+
+    function snapshot() {
+      return canvas.toDataURL("image/png");
+    }
+
+    function pushHistory() {
+      const state = { data: snapshot(), hasInk };
+      if (history[historyIndex]?.data === state.data) return;
+      history = history.slice(0, historyIndex + 1);
+      history.push(state);
+      if (history.length > 24) history.shift();
+      historyIndex = history.length - 1;
+      updateHistoryButtons();
+    }
+
+    function updateHistoryButtons() {
+      undoButton.disabled = historyIndex <= 0;
+      redoButton.disabled = historyIndex < 0 || historyIndex >= history.length - 1;
+    }
+
+    function restoreSnapshot(dataUrl, inkState = true) {
+      const version = ++restoreVersion;
+      return new Promise((resolve) => {
+        const image = new Image();
+        image.onload = () => {
+          if (version !== restoreVersion) return resolve(false);
+          context.save();
+          context.setTransform(1, 0, 0, 1, 0, 0);
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(image, 0, 0, image.naturalWidth, image.naturalHeight, 0, 0, canvas.width, canvas.height);
+          context.restore();
+          hasInk = inkState;
+          hint.hidden = !inkState;
+          resolve(true);
+        };
+        image.onerror = () => resolve(false);
+        image.src = dataUrl;
+      });
+    }
+
+    async function undo() {
+      if (historyIndex <= 0) return;
+      historyIndex -= 1;
+      updateHistoryButtons();
+      const state = history[historyIndex];
+      await restoreSnapshot(state.data, state.hasInk);
+      queueAutosave();
+    }
+
+    async function redo() {
+      if (historyIndex >= history.length - 1) return;
+      historyIndex += 1;
+      updateHistoryButtons();
+      const state = history[historyIndex];
+      await restoreSnapshot(state.data, state.hasInk);
+      queueAutosave();
+    }
+
+    function clearCanvas() {
+      restoreVersion += 1;
+      context.save();
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.restore();
+      hasInk = false;
+      hint.hidden = false;
+      pushHistory();
+      queueAutosave();
+    }
+
+    function queueAutosave() {
+      window.clearTimeout(saveTimer);
+      saveStatus.textContent = "Wird gespeichert …";
+      saveTimer = window.setTimeout(saveBoard, 220);
+    }
+
+    function saveBoard() {
+      try {
+        window.localStorage.setItem(STORAGE.whiteboard, JSON.stringify({
+          version: 1,
+          image: snapshot(),
+          hasInk
+        }));
+        saveStatus.textContent = "Lokal gespeichert";
+      } catch {
+        saveStatus.textContent = "Lokaler Speicher nicht verfügbar";
+      }
+    }
+
+    function exportPng() {
+      const exportCanvas = document.createElement("canvas");
+      exportCanvas.width = canvas.width;
+      exportCanvas.height = canvas.height;
+      const exportContext = exportCanvas.getContext("2d");
+      exportContext.fillStyle = "#fbfbfa";
+      exportContext.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+      exportContext.drawImage(canvas, 0, 0);
+      exportCanvas.toBlob((blob) => {
+        if (!blob) return;
+        const link = document.createElement("a");
+        const date = new Date().toISOString().slice(0, 10);
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = `whiteboard-${date}.png`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }, "image/png");
+    }
+
+    penButton.addEventListener("click", () => setTool("pen"));
+    eraserButton.addEventListener("click", () => setTool("eraser"));
+    document.querySelectorAll("[data-whiteboard-color]").forEach((swatch) => {
+      swatch.addEventListener("click", () => setColor(swatch.dataset.whiteboardColor, swatch));
+    });
+    colorInput.addEventListener("input", () => setColor(colorInput.value));
+    widthInput.addEventListener("input", () => {
+      strokeWidth = Number(widthInput.value);
+      widthOutput.textContent = String(strokeWidth);
+    });
+    undoButton.addEventListener("click", undo);
+    redoButton.addEventListener("click", redo);
+    clearButton.addEventListener("click", () => {
+      if (typeof clearDialog.showModal === "function") clearDialog.showModal();
+      else if (window.confirm("Das gesamte Whiteboard leeren?")) clearCanvas();
+    });
+    confirmClear.addEventListener("click", () => {
+      clearCanvas();
+      clearDialog.close();
+    });
+    exportButton.addEventListener("click", exportPng);
+    canvas.addEventListener("pointerdown", beginStroke);
+    canvas.addEventListener("pointermove", continueStroke);
+    canvas.addEventListener("pointerup", endStroke);
+    canvas.addEventListener("pointercancel", endStroke);
+    canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+    document.addEventListener("keydown", (event) => {
+      const modifier = event.metaKey || event.ctrlKey;
+      const key = event.key.toLowerCase();
+      if (modifier && key === "z") {
+        event.preventDefault();
+        if (event.shiftKey) redo();
+        else undo();
+        return;
+      }
+      if (modifier && key === "y") {
+        event.preventDefault();
+        redo();
+        return;
+      }
+      if (event.target.matches("input, button")) return;
+      if (key === "p") setTool("pen");
+      if (key === "e") setTool("eraser");
+    });
+
+    const resizeObserver = typeof ResizeObserver === "function" ? new ResizeObserver(() => {
+      if (initialized) resizeCanvas(true);
+    }) : null;
+    if (resizeObserver) resizeObserver.observe(canvasWrap);
+    else window.addEventListener("resize", () => resizeCanvas(true));
+
+    window.requestAnimationFrame(async () => {
+      resizeCanvas(false);
+      const saved = safeStorageGet(STORAGE.whiteboard);
+      if (saved) {
+        let savedImage = saved;
+        let savedHasInk = true;
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed.image === "string") {
+            savedImage = parsed.image;
+            savedHasInk = parsed.hasInk !== false;
+          }
+        } catch {
+          // Backwards compatible with an earlier raw data URL.
+        }
+        await restoreSnapshot(savedImage, savedHasInk);
+      }
+      history = [{ data: snapshot(), hasInk }];
+      historyIndex = 0;
+      updateHistoryButtons();
+      initialized = true;
+      saveStatus.textContent = saved ? "Lokal wiederhergestellt" : "Lokal bereit";
+    });
+  }
+
   function renderNotFound() {
     document.title = "Nicht gefunden · Studio Widgets";
     app.innerHTML = `
       <section class="error-state">
         <p class="eyebrow">404</p>
         <h2>Dieses Widget gibt es nicht.</h2>
-        <p class="lede">Zurück zur Übersicht und eines der vier verfügbaren Werkzeuge öffnen.</p>
+        <p class="lede">Zurück zur Übersicht und eines der fünf verfügbaren Werkzeuge öffnen.</p>
         <p><a class="button" href="/">Zur Übersicht</a></p>
       </section>`;
   }
@@ -625,6 +1063,7 @@
     case "pomodoro": renderPomodoro(); break;
     case "progress": renderProgress(); break;
     case "calculator": renderCalculator(); break;
+    case "whiteboard": renderWhiteboard(); break;
     default: renderNotFound(); initializeTheme();
   }
 })();

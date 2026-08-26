@@ -17,6 +17,7 @@
     { "source": "/clock", "destination": "/index.html?widget=clock" },
     { "source": "/pomodoro", "destination": "/index.html?widget=pomodoro" },
     { "source": "/progress", "destination": "/index.html?widget=progress" },
-    { "source": "/calculator", "destination": "/index.html?widget=calculator" }
+    { "source": "/calculator", "destination": "/index.html?widget=calculator" },
+    { "source": "/whiteboard", "destination": "/index.html?widget=whiteboard" }
   ]
 }
