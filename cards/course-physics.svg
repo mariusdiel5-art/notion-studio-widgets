@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640">
+  <rect width="1200" height="640" fill="#f5f3ef"/>
+  <g fill="none" stroke="#242424" stroke-width="7" stroke-linecap="round">
+    <ellipse cx="365" cy="325" rx="235" ry="95" transform="rotate(20 365 325)"/>
+    <ellipse cx="365" cy="325" rx="235" ry="95" transform="rotate(-20 365 325)"/>
+    <ellipse cx="365" cy="325" rx="95" ry="235"/>
+    <circle cx="365" cy="325" r="25" fill="#242424"/>
+    <path d="M690 470l135-285 125 285M735 375h175M1010 185v285"/>
+  </g>
+  <text x="675" y="120" font-family="Georgia,serif" font-size="50" fill="#242424">E = mc²</text>
+</svg>

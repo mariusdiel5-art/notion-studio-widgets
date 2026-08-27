@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640">
+  <rect width="1200" height="640" fill="#f5f3ef"/>
+  <g fill="none" stroke="#242424" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M105 520h430M150 485V280M255 485V205M360 485V335M465 485V145"/>
+    <path d="M680 500V150h400M710 445l95-105 92 45 132-180"/>
+    <path d="M100 120h360M100 165h250M735 125h255" stroke-width="5"/>
+    <circle cx="805" cy="340" r="18" fill="#242424"/><circle cx="897" cy="385" r="18" fill="#242424"/><circle cx="1029" cy="205" r="18" fill="#242424"/>
+  </g>
+  <text x="100" y="95" font-family="Georgia,serif" font-size="46" fill="#242424">SUPPLY · DEMAND · VALUE</text>
+</svg>

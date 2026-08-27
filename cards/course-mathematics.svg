@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640">
+  <rect width="1200" height="640" fill="#f5f3ef"/>
+  <g fill="none" stroke="#242424" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="270" cy="330" r="155"/><path d="M115 330h310M270 175v310M160 440L380 220"/>
+    <path d="M585 490h500M630 455V190M650 420c105-260 240-260 385 0"/>
+    <path d="M540 110h520M540 145h315" stroke-width="4"/>
+  </g>
+  <text x="540" y="90" font-family="Georgia,serif" font-size="48" fill="#242424">∫ f(x) dx   ·   πr²   ·   ∑</text>
+</svg>
