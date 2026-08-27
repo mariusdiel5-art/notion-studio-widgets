@@ -61,7 +61,7 @@
 }
 
 html {
-  min-width: 280px;
+  min-width: 0;
   min-height: 100%;
   background: var(--bg);
 }
@@ -1373,6 +1373,37 @@ body.embed .whiteboard-layout {
 
   .stroke-control input[type="range"] {
     width: 64px;
+  }
+}
+
+/* Notion can render embeds in very narrow dashboard columns. Keep the
+   clock usable instead of honoring the full-site minimum layout width. */
+@media (max-width: 360px) {
+  body.embed .widget-meta {
+    min-height: 38px;
+    padding: 10px 12px;
+    font-size: 9px;
+  }
+
+  body.embed .widget-meta > :last-child,
+  body.embed .embed-theme-toggle,
+  body.embed .clock-info {
+    display: none;
+  }
+
+  body.embed .clock-layout {
+    display: block;
+    min-height: calc(100vh - 38px);
+  }
+
+  body.embed .clock-stage {
+    min-height: calc(100vh - 38px);
+    padding: 14px 10px;
+    border: 0;
+  }
+
+  body.embed .analog-clock {
+    width: min(100%, 220px);
   }
 }
 
