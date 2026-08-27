@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640">
+  <rect width="1200" height="640" fill="#f5f3ef"/>
+  <g fill="none" stroke="#242424" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M145 182h190v120H145zM505 182h190v120H505zM865 182h190v120H865z"/>
+    <path d="M335 242h170M695 242h170"/>
+    <path d="M467 218l38 24-38 24M827 218l38 24-38 24"/>
+    <path d="M190 430c60-105 150-105 210 0 60 105 150 105 210 0 60-105 150-105 210 0 60 105 150 105 210 0"/>
+    <circle cx="240" cy="242" r="24" fill="#b28a48"/><circle cx="600" cy="242" r="24" fill="#b28a48"/><circle cx="960" cy="242" r="24" fill="#b28a48"/>
+  </g>
+  <text x="124" y="135" font-family="Georgia,serif" font-size="42" fill="#242424">REIZ</text>
+  <text x="478" y="135" font-family="Georgia,serif" font-size="42" fill="#242424">BEWERTUNG</text>
+  <text x="850" y="135" font-family="Georgia,serif" font-size="42" fill="#242424">REAKTION</text>
+</svg>
