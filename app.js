@@ -14,6 +14,15 @@
   };
 
   const params = new URLSearchParams(window.location.search);
+  const stateScope = (params.get("scope") || "default")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "")
+    .slice(0, 32) || "default";
+
+  function scopedStorageKey(baseKey) {
+    return stateScope === "default" ? baseKey : `${baseKey}:${stateScope}`;
+  }
+
   const routeAliases = {
     clock: "clock",
     uhr: "clock",
@@ -286,7 +295,7 @@
         sessions: 0,
         sessionDate: localDateKey(new Date())
       };
-      const stored = safeStorageGet(STORAGE.pomodoro);
+      const stored = safeStorageGet(scopedStorageKey(STORAGE.pomodoro));
       if (!stored) return fallback;
       try {
         const parsed = { ...fallback, ...JSON.parse(stored) };
@@ -310,7 +319,7 @@
     }
 
     function saveState() {
-      safeStorageSet(STORAGE.pomodoro, JSON.stringify(state));
+      safeStorageSet(scopedStorageKey(STORAGE.pomodoro), JSON.stringify(state));
     }
 
     function durationForMode() {
@@ -937,7 +946,7 @@
 
     function saveBoard() {
       try {
-        window.localStorage.setItem(STORAGE.whiteboard, JSON.stringify({
+        window.localStorage.setItem(scopedStorageKey(STORAGE.whiteboard), JSON.stringify({
           version: 1,
           image: snapshot(),
           hasInk
@@ -1023,7 +1032,7 @@
 
     window.requestAnimationFrame(async () => {
       resizeCanvas(false);
-      const saved = safeStorageGet(STORAGE.whiteboard);
+      const saved = safeStorageGet(scopedStorageKey(STORAGE.whiteboard));
       if (saved) {
         let savedImage = saved;
         let savedHasInk = true;

@@ -30,4 +30,4 @@ Die Pfade `/clock`, `/pomodoro`, `/progress`, `/calculator` und `/whiteboard` fu
 
 ## Persistenz
 
-Der Pomodoro-Zustand, das Whiteboard und die optionale Farbschema-Auswahl werden ausschließlich im `localStorage` des Browsers gespeichert. Ist lokaler Speicher im eingebetteten Browser deaktiviert, funktionieren die Widgets weiterhin, verlieren ihren Zustand aber bei einem Reload.
+Der Pomodoro-Zustand, das Whiteboard und die optionale Farbschema-Auswahl werden ausschließlich im `localStorage` des Browsers gespeichert. Mit `scope=studium` oder `scope=brain` lassen sich getrennte Timer- und Whiteboard-Zustände auf derselben Domain führen. Ist lokaler Speicher im eingebetteten Browser deaktiviert, funktionieren die Widgets weiterhin, verlieren ihren Zustand aber bei einem Reload.
